@@ -5,8 +5,7 @@ import 'package:intl_phone_number_input/src/models/country_model.dart';
 const String PropertyName = 'alpha_2_code';
 
 class CountryProvider {
-  static List<Country> getCountriesData(
-      {@required BuildContext context, @required List<String> countries}) {
+  static List<Country> getCountriesData({@required List<String> countries}) {
     List jsonList = Countries.countryList;
 
     if (countries == null || countries.isEmpty) {

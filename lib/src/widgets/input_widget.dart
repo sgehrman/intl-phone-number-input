@@ -213,11 +213,15 @@ class _InputWidgetState extends State<_InputWidget> {
   _loadCountries(BuildContext context) {
     InputProvider provider = Provider.of<InputProvider>(context, listen: false);
 
-    provider.countries = CountryProvider.getCountriesData(
-        context: context, countries: widget.countries);
+    var countries =
+        CountryProvider.getCountriesData(countries: widget.countries);
 
-    provider.country = Utils.getInitialSelectedCountry(
-        provider.countries, widget.initialCountry2LetterCode);
+    var items = _mapCountryToDropdownItem(countries);
+
+    var country = Utils.getInitialSelectedCountry(
+        countries, widget.initialCountry2LetterCode);
+
+    provider.setup(countries: countries, items: items, country: country);
   }
 
   void _phoneNumberControllerListener() {
@@ -272,7 +276,7 @@ class _InputWidgetState extends State<_InputWidget> {
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () => _loadCountries(context));
+    _loadCountries(context);
     controller = widget.textFieldController ?? TextEditingController();
     controller.addListener(_phoneNumberControllerListener);
     super.initState();
@@ -299,7 +303,7 @@ class _InputWidgetState extends State<_InputWidget> {
                 country: provider.country,
               ),
               value: provider.country,
-              items: _mapCountryToDropdownItem(provider.countries),
+              items: provider.items,
               onChanged: widget.isEnabled
                   ? (value) {
                       provider.country = value;
@@ -337,7 +341,8 @@ class _InputWidgetState extends State<_InputWidget> {
                     : WhitelistingTextInputFormatter.digitsOnly,
               ],
               onChanged: (text) {
-                _phoneNumberControllerListener();
+                // controller is already listening, do we need this?
+                // _phoneNumberControllerListener();
               },
             ),
           )
@@ -385,7 +390,7 @@ class _Item extends StatelessWidget {
                   package: 'intl_phone_number_input',
                 )
               : SizedBox.shrink(),
-          SizedBox(width: 12.0),
+          SizedBox(width: 6.0),
           Text(
             country?.dialCode ?? '',
           )
